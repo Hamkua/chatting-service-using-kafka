@@ -8,6 +8,10 @@
 .idea/
 HELP.md
 
+/**/resources/application-secret.properties
+build
+build/
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
