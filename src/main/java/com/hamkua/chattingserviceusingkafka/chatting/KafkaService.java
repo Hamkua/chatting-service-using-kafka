@@ -1,7 +1,10 @@
 package com.hamkua.chattingserviceusingkafka.chatting;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.DeleteTopicsResult;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.stereotype.Service;
@@ -13,6 +16,8 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 public class KafkaService {
+
+    Logger log = LoggerFactory.getLogger(KafkaService.class.getSimpleName());
 
     private AdminClient admin;
 
@@ -36,6 +41,17 @@ public class KafkaService {
     }
 
 
+    public boolean deleteTopic(String topicName){
+
+        try {
+            DeleteTopicsResult deleteTopicsResult = admin.deleteTopics(Collections.singleton(topicName));
+
+        } catch (Exception e){
+            return false;
+        }
+
+        return true;
+    }
 
 
 }
