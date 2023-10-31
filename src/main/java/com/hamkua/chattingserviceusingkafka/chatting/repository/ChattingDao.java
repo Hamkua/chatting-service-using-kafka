@@ -15,7 +15,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class ChattingDao {
@@ -84,6 +86,29 @@ public class ChattingDao {
                  }, keyHolder);
 
         return keyHolder.getKey().longValue();
+    }
+
+    public Map<String, Long> createChattingRoomUser(Long chattingRoomId, Long userId){
+        String query = "insert into CHATTING_ROOM_USER(id, user_id) values(?, ?)";
+
+        this.jdbcTemplate.update(
+                new PreparedStatementCreator() {
+                    @Override
+                    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+                        PreparedStatement pstmt = con.prepareStatement(query);
+                        pstmt.setLong(1, chattingRoomId);
+                        pstmt.setLong(2, userId);
+
+                        return pstmt;
+                    }
+                }
+        );
+
+        Map<String, Long> keys = new HashMap<>();
+        keys.put("id", chattingRoomId);
+        keys.put("user_id", userId);
+
+        return keys;
     }
 
 }
