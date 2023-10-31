@@ -2,6 +2,7 @@ package com.hamkua.chattingserviceusingkafka.chatting.service;
 
 import com.hamkua.chattingserviceusingkafka.chatting.ConsumerManager;
 import com.hamkua.chattingserviceusingkafka.chatting.dto.ChattingRoomDto;
+import com.hamkua.chattingserviceusingkafka.chatting.dto.ChattingRoomUserDto;
 import com.hamkua.chattingserviceusingkafka.chatting.repository.ChattingDao;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -41,4 +42,27 @@ public class ChattingService {
         return compositeKeys.size() == 2 && isAdded;
     }
 
+    public Boolean createChattingRoom(List<Long> userIds){
+        Long chattingRoomId = chattingDao.createChattingRoom();
+
+        for(Long userId : userIds) {
+            Map<String, Long> compositeKeys = chattingDao.createChattingRoomUser(chattingRoomId, userId);
+            Boolean isAdded = consumerManager.addConsumerWorker(chattingRoomId, userId);
+
+
+            if(compositeKeys.size() != 2 || !isAdded){    // 중간에 문제가 생기는 경우 원래 상태로 되돌린다.
+                List<ChattingRoomUserDto> chattingRoomUsers = chattingDao.findAllChattingRoomUserByChattingRoomId(chattingRoomId);
+
+                for(ChattingRoomUserDto chattingRoomUser : chattingRoomUsers) {
+
+                    consumerManager.subConsumerWorker(chattingRoomId, chattingRoomUser.getUserId());
+                }
+
+                chattingDao.deleteChattingRoomUser(chattingRoomId);
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

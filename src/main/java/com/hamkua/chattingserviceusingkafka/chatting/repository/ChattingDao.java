@@ -76,6 +76,13 @@ public class ChattingDao {
         return this.jdbcTemplate.query(query, new ChattingRoomRowMapper());
     }
 
+
+    public List<ChattingRoomUserDto> findAllChattingRoomUserByChattingRoomId(Long chattingRoomId){
+        String query = "select * from CHATTING_ROOM_USER where id = ?";
+
+        return this.jdbcTemplate.query(query, new ChattingRoomUserRowMapper(), chattingRoomId);
+    }
+
     public Long createChattingRoom(){
         String query = "insert into CHATTING_ROOM values()";
 
@@ -120,4 +127,16 @@ public class ChattingDao {
         return keys;
     }
 
+
+    public Integer deleteChattingRoomUser(Long chattingRoomId, Long userId){
+        String query = "delete from CHATTING_ROOM_USER where id = ? and user_id = ?";
+
+        return this.jdbcTemplate.update(query, chattingRoomId, userId);
+    }
+
+    public Integer deleteChattingRoomUser(Long chattingRoomId){
+        String query = "delete from CHATTING_ROOM_USER where id = ?";
+
+        return this.jdbcTemplate.update(query, chattingRoomId);
+    }
 }
