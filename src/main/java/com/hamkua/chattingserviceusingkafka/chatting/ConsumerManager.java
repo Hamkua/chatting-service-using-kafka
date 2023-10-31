@@ -1,5 +1,6 @@
 package com.hamkua.chattingserviceusingkafka.chatting;
 
+import com.hamkua.chattingserviceusingkafka.chatting.dto.ChattingRoomUserDto;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Properties;
 @Service
 public class ConsumerManager {
 
-    private static final Logger log = LoggerFactory.getLogger(ConsumerManager.class.getSimpleName());
+    Logger log = LoggerFactory.getLogger(ConsumerManager.class.getSimpleName());
 
     private Properties props;
 
@@ -37,19 +38,36 @@ public class ConsumerManager {
         props.setProperty("auto.offset.reset", "earliest");
     }
 
-    public void findAllBrokers(){
-        workers.forEach(worker -> log.info(worker.toString()));
+    public Boolean addConsumerWorker(Long chattingRoomId, Long userId){
+
+        try {
+            ConsumerWorker worker = new ConsumerWorker(props, chattingRoomId, userId);
+
+            workers.add(worker);
+
+            Thread thread = new Thread(worker);
+            thread.start();
+
+        }catch(Exception e){
+            return false;
+        }
+
+        return true;
     }
 
-    public void addConsumerWorker(Long chattingRoomId, Long userId){
-        ConsumerWorker worker = new ConsumerWorker(props, chattingRoomId, userId);
 
-        workers.add(worker);
+    public ConsumerWorker getConsumerWorker(Long chattingRoomId, Long userId){
+        String threadName = "consumer-thread" + chattingRoomId + userId;
 
-        Thread thread = new Thread(worker);
-        thread.start();
+        ConsumerWorker result = null;
 
-        log.info(Thread.currentThread().getName());
+        for(ConsumerWorker worker : workers){
+            if(threadName.equals(worker.getThreadName())){
+
+                result = worker;
+            }
+        }
+
+        return result;
     }
-
 }
