@@ -26,10 +26,6 @@ public class ConsumerWorker implements Runnable{
     private KafkaConsumer<String, String> consumer;
 
 
-    public String getThreadName() {
-        return threadName;
-    }
-
     public ConsumerWorker(Properties prop, Long chattingRoomId, Long userId) {
         this.prop = prop;
 
@@ -38,13 +34,14 @@ public class ConsumerWorker implements Runnable{
 
         this.topic = "test" + chattingRoomId;
         this.threadName = "consumer-thread" + chattingRoomId + userId;
+
+        consumer = new KafkaConsumer<>(prop);
+        consumer.subscribe(Collections.singletonList(topic));
     }
 
     @Override
     public void run() {
         Thread.currentThread().setName(threadName);
-        consumer = new KafkaConsumer<>(prop);
-        consumer.subscribe(Collections.singletonList(topic));
 
         try{
             while (true){
@@ -60,15 +57,18 @@ public class ConsumerWorker implements Runnable{
         }catch (Exception e){
             log.error(e.getMessage(), e);
         }finally {
+            log.info(this.threadName + " close");
             consumer.close();
         }
     }
-
 
     public void wakeup(){
         consumer.wakeup();
     }
 
+    public String getThreadName() {
+        return threadName;
+    }
 
 //    @Override
 //    public boolean equals(Object obj) {
