@@ -55,6 +55,23 @@ public class ConsumerManager {
         return true;
     }
 
+    public Boolean subConsumerWorker(Long chattingRoomId, Long userId){
+
+        String threadName = "consumer-thread" + chattingRoomId + userId;
+
+        for(ConsumerWorker worker : workers){
+            if(threadName.equals(worker.getThreadName())){
+
+                worker.wakeup();
+                workers.remove(worker);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     public ConsumerWorker getConsumerWorker(Long chattingRoomId, Long userId){
         String threadName = "consumer-thread" + chattingRoomId + userId;
