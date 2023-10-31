@@ -23,6 +23,9 @@ public class ConsumerManager {
 
     private static List<ConsumerWorker> workers = new ArrayList<>();
 
+    private final Thread mainThread = Thread.currentThread();
+
+
     @PostConstruct
     private void init(){
         props = new Properties();
@@ -32,15 +35,14 @@ public class ConsumerManager {
         props.setProperty("key.deserializer", StringDeserializer.class.getName());
         props.setProperty("value.deserializer", StringDeserializer.class.getName());
         props.setProperty("auto.offset.reset", "earliest");
-        props.setProperty("group.id", "1");
     }
 
     public void findAllBrokers(){
         workers.forEach(worker -> log.info(worker.toString()));
     }
 
-    public void addConsumerWorker(int num){
-        ConsumerWorker worker = new ConsumerWorker(props, "test", num);
+    public void addConsumerWorker(Long chattingRoomId, Long userId){
+        ConsumerWorker worker = new ConsumerWorker(props, chattingRoomId, userId);
 
         workers.add(worker);
 

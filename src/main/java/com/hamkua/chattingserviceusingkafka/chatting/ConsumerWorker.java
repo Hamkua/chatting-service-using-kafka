@@ -25,10 +25,14 @@ public class ConsumerWorker implements Runnable{
     private KafkaConsumer<String, String> consumer;
 
 
-    public ConsumerWorker(Properties prop, String topic, int number) {
+    public ConsumerWorker(Properties prop, Long chattingRoomId, Long userId) {
         this.prop = prop;
-        this.topic = topic;
-        this.threadName = "consumer-thread" + number;
+
+        // 각 워커마다 다른 group.id를 부여하지 않으면 파티션을 공유하게 된다.
+        prop.setProperty("group.id", String.valueOf(chattingRoomId) + userId);
+
+        this.topic = String.valueOf(chattingRoomId) + userId;
+        this.threadName = "consumer-thread" + chattingRoomId + userId;
     }
 
     @Override
