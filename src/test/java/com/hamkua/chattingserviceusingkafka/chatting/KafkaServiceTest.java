@@ -28,4 +28,18 @@ class KafkaServiceTest {
         //then
         assertTrue(isTopicCreated);
     }
+
+    @Test
+    @DisplayName("토픽 삭제 테스트")
+    void deleteTopicTest(){
+
+        //given
+        String topicName = "test2";
+
+        //when
+        boolean isTopicDeleted = kafkaService.deleteTopic(topicName);
+
+        //then
+        assertTrue(isTopicDeleted);
+    }
 }
