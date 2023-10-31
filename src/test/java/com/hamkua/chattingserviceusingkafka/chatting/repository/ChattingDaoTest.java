@@ -59,4 +59,18 @@ class ChattingDaoTest {
         assertEquals(2, keys.size());
 
     }
+    
+    @Test
+    @DisplayName("CHATTING_ROOM 테이블에 pk 존재 여부 테스트")
+    void existsChattingRoomTest(){
+        
+        //given
+        Long chattingRoomId = Long.MIN_VALUE;
+        
+        //when
+        Boolean doesExist= chattingDao.existsChattingRoom(chattingRoomId);
+
+        //then
+        assertFalse(doesExist);
+    }
 }
