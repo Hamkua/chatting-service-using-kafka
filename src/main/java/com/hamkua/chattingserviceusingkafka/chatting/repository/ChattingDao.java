@@ -56,6 +56,12 @@ public class ChattingDao {
         }
     }
 
+    public Boolean existsChattingRoom(Long chattingRoomId){
+        String query = "select if(exists(select * from CHATTING_ROOM where id = ?), 1, 0)";
+
+        return this.jdbcTemplate.queryForObject(query, Boolean.class, chattingRoomId);
+    }
+
 
     public List<ChattingRoomDto> findAllChattingRoom(){
         String query = "select * from CHATTING_ROOM where state = 1";
