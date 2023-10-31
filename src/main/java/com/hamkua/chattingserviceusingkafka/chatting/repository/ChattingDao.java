@@ -89,7 +89,8 @@ public class ChattingDao {
     }
 
     public Map<String, Long> createChattingRoomUser(Long chattingRoomId, Long userId){
-        String query = "insert into CHATTING_ROOM_USER(id, user_id) values(?, ?)";
+        String query = "insert into CHATTING_ROOM_USER(id, user_id) " +
+                "select ?, ? from dual where not exists(select * from CHATTING_ROOM_USER where id = ? and user_id = ?)";
 
         this.jdbcTemplate.update(
                 new PreparedStatementCreator() {
@@ -98,6 +99,8 @@ public class ChattingDao {
                         PreparedStatement pstmt = con.prepareStatement(query);
                         pstmt.setLong(1, chattingRoomId);
                         pstmt.setLong(2, userId);
+                        pstmt.setLong(3, chattingRoomId);
+                        pstmt.setLong(4, userId);
 
                         return pstmt;
                     }
