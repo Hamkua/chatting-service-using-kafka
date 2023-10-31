@@ -1,5 +1,6 @@
 package com.hamkua.chattingserviceusingkafka.chatting.repository;
 
+import com.hamkua.chattingserviceusingkafka.chatting.dto.ChattingRoomUserDto;
 import com.hamkua.chattingserviceusingkafka.chatting.service.ChattingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,5 +74,33 @@ class ChattingDaoTest {
 
         //then
         assertFalse(doesExist);
+    }
+
+    @Test
+    void findAllChattingRoomUserByChattingRoomIdTest(){
+
+        //given
+        Long chattingRoomId = Long.MIN_VALUE;
+
+        //when
+        List<ChattingRoomUserDto> result = chattingDao.findAllChattingRoomUserByChattingRoomId(chattingRoomId);
+
+        //then
+        assertEquals(0, result.size());
+
+    }
+
+    @Test
+    void deleteChattingRoomUserTest(){
+
+        //given
+        Long chattingRoomId = 3L;
+        Long userId = 2L;
+
+        //when
+        Integer i = chattingDao.deleteChattingRoomUser(chattingRoomId, userId);
+
+        //then
+        assertEquals(1, i);
     }
 }
