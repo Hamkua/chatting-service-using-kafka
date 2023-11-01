@@ -1,5 +1,6 @@
 package com.hamkua.chattingserviceusingkafka.chatting.service;
 
+import com.hamkua.chattingserviceusingkafka.chatting.dto.ChattingRoomUserDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -28,10 +29,10 @@ class ChattingServiceTest {
         // 아무 숫자나 넣어도 됨
         Long chattingRoomId = 3L;
         Long userId = 1L;
-
+        ChattingRoomUserDto chattingRoomUserDto = new ChattingRoomUserDto(chattingRoomId, userId);
 
         //when
-        Boolean isJoined = chattingService.joinChattingRoom(chattingRoomId, userId);
+        Boolean isJoined = chattingService.enterChattingRoom(chattingRoomUserDto);
 
         //then
         assertTrue(isJoined);
@@ -41,11 +42,11 @@ class ChattingServiceTest {
     @Transactional
     void createChattingRoomTest(){
         //given
-        List<Long> userIds = new ArrayList<>(Arrays.asList(Long.MAX_VALUE, Long.MAX_VALUE - 1));
+        ArrayList<ChattingRoomUserDto> invitedUsers = new ArrayList<>(Arrays.asList(new ChattingRoomUserDto(Long.MAX_VALUE), new ChattingRoomUserDto(Long.MAX_VALUE - 1)));
 
 
         //when
-        Boolean isCreated = chattingService.createChattingRoom(userIds);
+        Boolean isCreated = chattingService.createChattingRoom(invitedUsers);
 
 
         //then

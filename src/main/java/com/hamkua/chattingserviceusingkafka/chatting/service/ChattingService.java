@@ -23,16 +23,11 @@ public class ChattingService {
     private final KafkaService kafkaService;
     private final ConsumerManager consumerManager;
 
-//    유저가 소속된 채팅방 수 만큼 워커 생성 - 처음
-    public void createConsumer(Long userId){
-        List<ChattingRoomDto> chattingRooms = chattingDao.findAllChattingRoomByUserId(userId);
+    public Boolean enterChattingRoom(ChattingRoomUserDto chattingRoomUserDto){
 
-        chattingRooms.forEach(
-                chattingRoomDto -> consumerManager.addConsumerWorker(chattingRoomDto.getId(), userId)
-        );
-    }
+        Long chattingRoomId = chattingRoomUserDto.getChattingRoomId();
+        Long userId = chattingRoomUserDto.getUserId();
 
-    public Boolean joinChattingRoom(Long chattingRoomId, Long userId){
         if(!chattingDao.existsChattingRoom(chattingRoomId)){
 
             log.info("해당 채팅방이 존재하지 않음. 채팅방 번호 : {}", chattingRoomId);
@@ -45,7 +40,7 @@ public class ChattingService {
         return compositeKeys.size() == 2 && isAdded;
     }
 
-    public Boolean createChattingRoom(List<Long> userIds){
+    public Boolean createChattingRoom(List<ChattingRoomUserDto> invitedUsers){
         Long chattingRoomId = chattingDao.createChattingRoom();
         log.info("채팅방 번호 : {}", chattingRoomId);
 
@@ -54,7 +49,8 @@ public class ChattingService {
             throw new RuntimeException("토픽 생성 실패");
         }
 
-        for(Long userId : userIds) {
+        for(ChattingRoomUserDto invitedUser : invitedUsers) {
+            Long userId = invitedUser.getUserId();
 
             Map<String, Long> compositeKeys = chattingDao.createChattingRoomUser(chattingRoomId, userId);
             Boolean isAdded = consumerManager.addConsumerWorker(chattingRoomId, userId);

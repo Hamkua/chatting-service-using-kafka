@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers("/login").permitAll()
                 .antMatchers("/register").permitAll()
+                .antMatchers("/ws/chat/*").permitAll()
                 .anyRequest().authenticated() // 나머지 요청 모두 인증 필요
 
                 .and()
@@ -37,7 +38,7 @@ public class SecurityConfig {
         return web -> {
             web.ignoring()
                     .antMatchers(
-                            "/login", "/register",
+                            "/login", "/register", "/ws/chat/*",
                             "/css/**", "/js/**", "/images/**", "/libs/**", "/scss/**"
                             );
         };
