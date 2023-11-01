@@ -36,7 +36,7 @@ public class ChattingController {
     }
 
 
-    @PostMapping
+    @PostMapping("/enter")
     public ResponseEntity<Object> enterChattingRoom(@RequestBody ChattingRoomUserDto chattingRoomUserDto){
 
         Boolean isEntered = chattingService.enterChattingRoom(chattingRoomUserDto);

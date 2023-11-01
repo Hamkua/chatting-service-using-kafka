@@ -42,4 +42,11 @@ class KafkaServiceTest {
         //then
         assertTrue(isTopicDeleted);
     }
+
+    @Test
+    void listTopicsTest(){
+        Boolean doesExist = kafkaService.existsTopic("test11");
+
+        assertTrue(doesExist);
+    }
 }

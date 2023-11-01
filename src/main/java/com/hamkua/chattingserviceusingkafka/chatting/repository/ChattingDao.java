@@ -63,6 +63,12 @@ public class ChattingDao {
     }
 
 
+    public Boolean existsChattingRoomUser(Long chattingRoomId){
+        String query = "select if(exists(select * from CHATTING_ROOM_USER where id = ?), 1, 0)";
+
+        return this.jdbcTemplate.queryForObject(query, Boolean.class, chattingRoomId);
+    }
+
     public List<ChattingRoomDto> findAllChattingRoom(){
         String query = "select * from CHATTING_ROOM where state = 1";
 
@@ -127,6 +133,11 @@ public class ChattingDao {
         return keys;
     }
 
+    public Integer deleteChattingRoom(Long chattingRoomId){
+        String query = "delete from CHATTING_ROOM where id = ?";
+
+        return this.jdbcTemplate.update(query, chattingRoomId);
+    }
 
     public Integer deleteChattingRoomUser(Long chattingRoomId, Long userId){
         String query = "delete from CHATTING_ROOM_USER where id = ? and user_id = ?";

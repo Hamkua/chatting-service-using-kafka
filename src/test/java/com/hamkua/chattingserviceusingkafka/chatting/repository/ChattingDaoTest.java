@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -88,6 +89,21 @@ class ChattingDaoTest {
         //then
         assertEquals(0, result.size());
 
+    }
+
+
+    @Test
+    @Transactional
+    void deleteChattingRoomTest(){
+
+        //given
+        Long chattingRoomId = chattingDao.createChattingRoom();
+
+        //when
+        Integer deletedRowNum = chattingDao.deleteChattingRoom(chattingRoomId);
+
+        //then
+        assertEquals(1, deletedRowNum);
     }
 
     @Test

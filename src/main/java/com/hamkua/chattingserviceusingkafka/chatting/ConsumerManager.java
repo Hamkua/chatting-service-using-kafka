@@ -44,6 +44,7 @@ public class ConsumerManager {
             ConsumerWorker worker = new ConsumerWorker(props, chattingRoomId, userId);
 
             workers.add(worker);
+            log.info("워커 추가 : {}", worker.getThreadName());
 
             Thread thread = new Thread(worker);
             thread.start();
@@ -56,10 +57,13 @@ public class ConsumerManager {
     }
 
     public Boolean subConsumerWorker(Long chattingRoomId, Long userId){
+        log.info("chattingRoomId : {}, userId : {}", chattingRoomId, userId);
 
+        log.info("threadName : {}", "consumer-thread" + chattingRoomId + userId);
         String threadName = "consumer-thread" + chattingRoomId + userId;
 
         for(ConsumerWorker worker : workers){
+            log.info("worker threadName : {}", worker.getThreadName());
             if(threadName.equals(worker.getThreadName())){
 
                 worker.wakeup();
@@ -86,5 +90,18 @@ public class ConsumerManager {
         }
 
         return result;
+    }
+
+    public Boolean existsConsumerWorker(Long chattingRoomId){
+        for(ConsumerWorker worker : workers){
+            String threadName = worker.getThreadName();
+
+            log.info(threadName.substring("consumer-thread".length(), "consumer-thread".length() + 1));
+
+            if(chattingRoomId.equals(Long.valueOf(threadName.substring("consumer-thread".length(), "consumer-thread".length() + 1)))){
+                return true;
+            }
+        }
+        return false;
     }
 }

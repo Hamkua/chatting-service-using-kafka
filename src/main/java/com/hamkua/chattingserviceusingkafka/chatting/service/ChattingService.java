@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -70,5 +71,29 @@ public class ChattingService {
         }
 
         return true;
+    }
+
+    public void exitChattingRoom(ChattingRoomUserDto chattingRoomUserDto){
+
+        Long chattingRoomId = chattingRoomUserDto.getChattingRoomId();
+        Long userId = chattingRoomUserDto.getUserId();
+
+        log.info("chattingRoomId : {}, userId : {}", chattingRoomId, userId);
+
+        chattingDao.deleteChattingRoomUser(chattingRoomId, userId);
+
+        Boolean isWorkerDeleted = consumerManager.subConsumerWorker(chattingRoomId, userId);
+        if(!isWorkerDeleted){
+            throw new RuntimeException("워커 삭제 실패");
+        }
+
+        Boolean doesExist = chattingDao.existsChattingRoomUser(chattingRoomId);
+        if(!doesExist){
+            Boolean isChattingRoomDeleted = chattingDao.deleteChattingRoom(chattingRoomId) == 1;
+            Boolean isTopicDeleted = kafkaService.deleteTopic("test" + chattingRoomId);
+            if(!isTopicDeleted || !isChattingRoomDeleted){
+                throw new RuntimeException("토픽 삭제 실패");
+            }
+        }
     }
 }
