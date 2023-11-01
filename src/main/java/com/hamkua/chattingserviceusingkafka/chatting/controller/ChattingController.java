@@ -37,7 +37,10 @@ public class ChattingController {
 
 
     @PostMapping("/enter")
-    public ResponseEntity<Object> enterChattingRoom(@RequestBody ChattingRoomUserDto chattingRoomUserDto){
+    public ResponseEntity<Object> enterChattingRoom(@CurrentUser UserVo userVo, @RequestParam Long chattingRoomId){
+
+        Long userId = userVo.getUserId();
+        ChattingRoomUserDto chattingRoomUserDto = new ChattingRoomUserDto(chattingRoomId, userId);
 
         Boolean isEntered = chattingService.enterChattingRoom(chattingRoomUserDto);
         if(isEntered){
@@ -45,6 +48,22 @@ public class ChattingController {
         }
 
         return ResponseEntity.ok("채팅방 입장 실패");
+    }
+
+
+    @PostMapping("/exit")
+    public ResponseEntity<Object> exitChattingRoom(@CurrentUser UserVo userVo, @RequestParam Long chattingRoomId){
+
+        Long userId = userVo.getUserId();
+        ChattingRoomUserDto chattingRoomUserDto = new ChattingRoomUserDto(chattingRoomId, userId);
+
+        try {
+            chattingService.exitChattingRoom(chattingRoomUserDto);
+        }catch (Exception e){
+            return ResponseEntity.ok("채팅방 나가기 실패");
+        }
+
+        return ResponseEntity.ok("채팅방 나가기 성공");
     }
 
 }
