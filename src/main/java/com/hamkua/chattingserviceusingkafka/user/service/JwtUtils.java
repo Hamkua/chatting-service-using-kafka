@@ -8,6 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletRequest;
@@ -93,7 +98,39 @@ public class JwtUtils {
         return username;
     }
 
-    public Boolean isTokenExist(String token){
+    public Boolean existsToken(ServletRequest request){
+        if(((HttpServletRequest)request).getHeader("Authorization") == null){
+            return false;
+        }
+
+        boolean isBearer = ((HttpServletRequest) request).getHeader("Authorization").startsWith("Bearer ");
+
+        if(!isBearer){
+            return false;
+        }
+
+        return true;
+    }
+
+    public Boolean existsToken(ServerHttpRequest request){
+        if(!request.getHeaders().containsKey("Authorization")){
+            log.info("웹 소켓 인증 실패");
+            return false;
+        }
+
+        String authorization = request.getHeaders().get("Authorization").get(0);
+        boolean isBearer = authorization.startsWith("Bearer ");
+
+        if(!isBearer){
+            log.info("웹 소켓 인증 실패");
+            return false;
+        }
+
+        return true;
+    }
+
+
+    public Boolean isTokenValid(String token){
         try {
             userDao.findUserByAccessToken(token);
 
@@ -121,28 +158,5 @@ public class JwtUtils {
         }
     }
 
-//    public Authentication getAuthentication(String token){
-//
-//        String username = this.extractUsernameFromToken(token);
-//        UserDetails userDetails = customUserDetailService.loadUserByUsername(username);    // 다운캐스팅
-//
-//        return new UsernamePasswordAuthenticationToken(userDetails,"", userDetails.getAuthorities());
-//    }
 
-    public Boolean isTokenValid(String token){
-        Boolean isTokenExist = this.isTokenExist(token);
-
-        if(isTokenExist) {    // 토큰이 사용된 적 있는 경우
-            if (this.isTokenExpired(token)) {    // 토큰이 만료된 경우
-                log.info("토큰 만료");
-
-                token = this.reIssue(token);
-            }
-//            Authentication authentication = this.getAuthentication(token);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            return true;
-        }
-        return false;
-    }
 }

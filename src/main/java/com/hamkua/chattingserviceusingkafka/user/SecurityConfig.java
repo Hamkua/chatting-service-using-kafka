@@ -1,5 +1,6 @@
 package com.hamkua.chattingserviceusingkafka.user;
 
+import com.hamkua.chattingserviceusingkafka.user.service.JwtUtils;
 import com.hamkua.chattingserviceusingkafka.user.service.UserFacadeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final UserFacadeService userFacadeService;
+    private final JwtUtils jwtUtils;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -29,7 +31,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated() // 나머지 요청 모두 인증 필요
 
                 .and()
-                .addFilterBefore(new JwtAuthFilter(userFacadeService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthFilter(userFacadeService, jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

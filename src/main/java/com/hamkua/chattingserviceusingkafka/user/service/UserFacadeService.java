@@ -44,22 +44,20 @@ public class UserFacadeService {
         return jwtUtils.createToken(userVo);
     }
 
+
+
+
     @Transactional
-    public Boolean authenticate(String token) {
-        Boolean isValid = jwtUtils.isTokenValid(token);
+    public void authenticate(String token) {
 
-        if(isValid) {
-//            Authentication authentication = this.getAuthentication(token);
 
-            String username = jwtUtils.extractUsernameFromToken(token);
+        String username = jwtUtils.extractUsernameFromToken(token);
 
-            UserDetails userDetails = customUserDetailService.loadUserByUsername(username);    // 다운캐스팅
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        UserDetails userDetails = customUserDetailService.loadUserByUsername(username);    // 다운캐스팅
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return isValid;
     }
 
 //    public Authentication getAuthentication(String token){
