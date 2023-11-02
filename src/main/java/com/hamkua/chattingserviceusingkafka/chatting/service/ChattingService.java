@@ -36,12 +36,12 @@ public class ChattingService {
         }
         Map<String, Long> compositeKeys = chattingDao.createChattingRoomUser(chattingRoomId, userId);
 
-        Boolean isAdded = consumerManager.addConsumerWorker(chattingRoomId, userId);
-
-        return compositeKeys.size() == 2 && isAdded;
+        return true;
     }
 
+    @Transactional
     public Boolean createChattingRoom(List<ChattingRoomUserDto> invitedUsers){
+
         Long chattingRoomId = chattingDao.createChattingRoom();
         log.info("채팅방 번호 : {}", chattingRoomId);
 
@@ -52,24 +52,10 @@ public class ChattingService {
 
         for(ChattingRoomUserDto invitedUser : invitedUsers) {
             Long userId = invitedUser.getUserId();
-
             Map<String, Long> compositeKeys = chattingDao.createChattingRoomUser(chattingRoomId, userId);
-            Boolean isAdded = consumerManager.addConsumerWorker(chattingRoomId, userId);
-
-
-            if(compositeKeys.size() != 2 || !isAdded){    // 중간에 문제가 생기는 경우 원래 상태로 되돌린다.
-                List<ChattingRoomUserDto> chattingRoomUsers = chattingDao.findAllChattingRoomUserByChattingRoomId(chattingRoomId);
-
-                for(ChattingRoomUserDto chattingRoomUser : chattingRoomUsers) {
-
-                    consumerManager.subConsumerWorker(chattingRoomId, chattingRoomUser.getUserId());
-                }
-
-                chattingDao.deleteChattingRoomUser(chattingRoomId);
-                return false;
-            }
         }
 
+        // 채팅방과 그 유저 목록을 담을 DTO를 반환하도록 변경한다.
         return true;
     }
 
@@ -81,11 +67,6 @@ public class ChattingService {
         log.info("chattingRoomId : {}, userId : {}", chattingRoomId, userId);
 
         chattingDao.deleteChattingRoomUser(chattingRoomId, userId);
-
-        Boolean isWorkerDeleted = consumerManager.subConsumerWorker(chattingRoomId, userId);
-        if(!isWorkerDeleted){
-            throw new RuntimeException("워커 삭제 실패");
-        }
 
         Boolean doesExist = chattingDao.existsChattingRoomUser(chattingRoomId);
         if(!doesExist){

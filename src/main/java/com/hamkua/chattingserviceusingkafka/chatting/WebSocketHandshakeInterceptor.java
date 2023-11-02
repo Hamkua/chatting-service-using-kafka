@@ -3,7 +3,6 @@ package com.hamkua.chattingserviceusingkafka.chatting;
 import com.hamkua.chattingserviceusingkafka.chatting.repository.ChattingDao;
 import com.hamkua.chattingserviceusingkafka.user.dto.UserVo;
 import com.hamkua.chattingserviceusingkafka.user.repository.UserDao;
-import com.hamkua.chattingserviceusingkafka.user.service.CustomUserDetailService;
 import com.hamkua.chattingserviceusingkafka.user.service.JwtUtils;
 import com.hamkua.chattingserviceusingkafka.user.service.UserFacadeService;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
-
     Logger log = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class.getSimpleName());
 
     private final UserFacadeService userFacadeService;

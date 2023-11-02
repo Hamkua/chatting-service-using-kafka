@@ -41,6 +41,7 @@ public class ConsumerWorker implements Runnable{
 
     @Override
     public void run() {
+        log.info("컨슈머 워커 실행 : {}", threadName);
         Thread.currentThread().setName(threadName);
 
         try{

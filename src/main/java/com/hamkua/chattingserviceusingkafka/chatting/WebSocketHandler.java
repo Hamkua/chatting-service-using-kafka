@@ -44,16 +44,29 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-        Object userId = session.getAttributes().get("userId");
+        Long chattingRoomId = (Long) session.getAttributes().get("chattingRoomId");
+        Long userId = (Long) session.getAttributes().get("userId");
 
-        log.info("afterConnectionEstablished userId : {}", userId);
+        //컨슈머 워커 생성
+        Boolean isWorkerAdded = consumerManager.addConsumerWorker(chattingRoomId, userId);
+        if(!isWorkerAdded){
+            throw new RuntimeException("워커 생성 실패");
+        }
     }
 
 
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
+
+        Long chattingRoomId = (Long) session.getAttributes().get("chattingRoomId");
+        Long userId = (Long) session.getAttributes().get("userId");
+
+        // 컨슈머 워커 삭제
+        Boolean isWorkerDeleted = consumerManager.subConsumerWorker(chattingRoomId, userId);
+        if(!isWorkerDeleted){
+            throw new RuntimeException("워커 삭제 실패");
+        }
     }
 
 }
