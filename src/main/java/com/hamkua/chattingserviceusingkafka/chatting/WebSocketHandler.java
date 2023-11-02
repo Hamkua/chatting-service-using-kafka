@@ -1,5 +1,6 @@
 package com.hamkua.chattingserviceusingkafka.chatting;
 
+import com.hamkua.chattingserviceusingkafka.chatting.service.ChattingService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,9 @@ import java.util.Map;
 public class WebSocketHandler extends TextWebSocketHandler {
 
     Logger log = LoggerFactory.getLogger(WebSocketHandler.class.getSimpleName());
+
+    private final ChattingService chattingService;
+    private final ConsumerManager consumerManager;
     private Map<Long, Map<Long, WebSocketSession>> chattingRooms = new HashMap<>();
 
     @Override
@@ -32,10 +36,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-
         Long requestedChattingRoomId = getRequestedChattingRoomId(session);
-
-
     }
 
 

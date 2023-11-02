@@ -24,6 +24,14 @@ public class JwtAuthFilter extends GenericFilter {
             return;
         }
 
+
+        boolean isBearer = ((HttpServletRequest) request).getHeader("Authorization").startsWith("Bearer ");
+
+        if(!isBearer){
+            chain.doFilter(request, response);
+            return;
+        }
+
         String token = ((HttpServletRequest)request).getHeader("Authorization").substring("Bearer ".length());
         log.info("토큰 : " + token);
 
