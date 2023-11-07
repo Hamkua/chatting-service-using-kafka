@@ -45,6 +45,7 @@ public class WebSocketHandshakeInterceptor extends HttpSessionHandshakeIntercept
             return false;
         }
 
+        // 웹 세션 연결 중 토큰이 만료될 가능성은?
         //토큰 만료 시 재발급
         Boolean isExpired = jwtUtils.isTokenExpired(token);
         if(isExpired){

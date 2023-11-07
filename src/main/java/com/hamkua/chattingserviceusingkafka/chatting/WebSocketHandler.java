@@ -11,10 +11,12 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -24,21 +26,27 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
     private final ChattingService chattingService;
     private final ConsumerManager consumerManager;
+
+    // 이후 일급컬렉션으로 변경하고 관련 로직을 이동시키자.
     private Map<Long, Map<Long, WebSocketSession>> chattingRooms = new HashMap<>();
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
-        URI uri = session.getUri();
-        String path = uri.getPath();
+        Long chattingRoomId = (Long) session.getAttributes().get("chattingRoomId");
+//        Long userId = (Long) session.getAttributes().get("userId");
 
-        log.info(path);
+        Map<Long, WebSocketSession> chattingRoom = chattingRooms.get(chattingRoomId);
+        Set<Long> userIds = chattingRoom.keySet();
 
-        HttpHeaders handshakeHeaders = session.getHandshakeHeaders();
-        List<String> authorization = handshakeHeaders.get("Authorization");
-
-        log.info("{}", authorization);
-
+        for(Long userId : userIds){
+            WebSocketSession webSocketSession = chattingRoom.get(userId);
+            try {
+                webSocketSession.sendMessage(message);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -52,8 +60,25 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if(!isWorkerAdded){
             throw new RuntimeException("워커 생성 실패");
         }
-    }
 
+
+        Map<Long, WebSocketSession> chattingRoom;
+
+        boolean doesRoomExist = chattingRooms.containsKey(chattingRoomId);
+        if(!doesRoomExist){
+
+            log.info("채팅방 map이 없으므로 생성");
+            chattingRoom = new HashMap<>();
+
+        }else {
+            log.info("채팅방이 존재함");
+            chattingRoom = chattingRooms.get(chattingRoomId);
+
+        }
+        chattingRoom.put(userId, session);
+        chattingRooms.put(chattingRoomId, chattingRoom);
+
+    }
 
 
     @Override
@@ -67,6 +92,21 @@ public class WebSocketHandler extends TextWebSocketHandler {
         if(!isWorkerDeleted){
             throw new RuntimeException("워커 삭제 실패");
         }
+
+        Map<Long, WebSocketSession> chattingRoom = this.chattingRooms.get(chattingRoomId);
+        chattingRoom.remove(userId);
+
+
+        if(chattingRoom.size() == 0){
+            chattingRooms.remove(chattingRoomId);
+            log.info("채팅방의 유저가 비어있음");
+        }else{
+            chattingRooms.put(chattingRoomId, chattingRoom);
+            log.info("채팅방의 유저가 남아있음");
+        }
     }
+
+
+
 
 }
